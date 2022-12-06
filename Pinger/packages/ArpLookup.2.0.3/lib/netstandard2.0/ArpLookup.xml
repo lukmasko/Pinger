@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ArpLookup</name>
+    </assembly>
+    <members>
+        <member name="T:ArpLookup.Arp">
+            <summary>
+            Provides ARP lookup functionality (IP address to MAC/Hardware address translation) on Windows and Linux platforms.
+            </summary>
+        </member>
+        <member name="P:ArpLookup.Arp.IsSupported">
+            <summary>
+            Gets a value indicating whether the ARP lookup functionality is supported on the current plattform.
+            </summary>
+        </member>
+        <member name="P:ArpLookup.Arp.LinuxPingTimeout">
+            <summary>
+            Gets or sets the timeout for pings that are performed on Linux platforms, if an IP address can not be found in the ARP table right away. Has no effect on other platforms.
+            </summary>
+        </member>
+        <member name="M:ArpLookup.Arp.LookupAsync(System.Net.IPAddress)">
+            <summary>
+            This tries to lookup the MAC address that corresponds to an IP address using a way supported on the current platform. Windows and Linux are supported.
+            On Windows an API call to IpHlpApi.SendARP is used. Beware that this implementation is not truly async but just returns a finished task containing the result.
+            On Linux the /proc/net/arp file, which contains systems the arp cache is read. If the IP address is found there the corresponding MAC address is returned directly.
+            Otherwise, an ICMP ping is sent to the given IP address and the arp cache lookup is repeated afterwards. This implementation uses async file IO and the framework's async ping implementation.
+            </summary>
+            <param name="ip">The IP address to look the mac address up for.</param>
+            <returns>The mac address if found, null otherwise.</returns>
+        </member>
+        <member name="M:ArpLookup.Arp.Lookup(System.Net.IPAddress)">
+            <summary>
+            This tries to lookup the MAC address that corresponds to an IP address using a way supported on the current platform. Windows and Linux are supported.
+            On Windows an API call to IpHlpApi.SendARP is used.
+            On Linux the /proc/net/arp file, which contains systems the arp cache is read. If the IP address is found there the corresponding MAC address is returned directly.
+            Otherwise, an ICMP ping is sent to the given IP address and the arp cache lookup is repeated afterwards. This implementation uses synchronous code.
+            </summary>
+            <param name="ip">The IP address to look the mac address up for.</param>
+            <returns>The mac address if found, null otherwise.</returns>
+        </member>
+        <member name="T:ArpLookup.Extensions">
+            <summary>
+            Provides simple static helper functions for internal usage as Extensions.
+            </summary>
+        </member>
+        <member name="M:ArpLookup.Extensions.ParseMacAddress(System.String)">
+            <summary>
+            Parses string representations of physical addresses. Supports : as well as - as separator.
+            </summary>
+            <param name="mac">String representation of a physical address.</param>
+            <returns>A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> instance that represents the given string. Throws if parsing fails.</returns>
+        </member>
+        <member name="T:ArpLookup.LinuxLookupService">
+            <summary>
+            Provides the necessary implementations for ARP lookups on Linux platforms.
+            </summary>
+        </member>
+        <member name="P:ArpLookup.LinuxLookupService.IsSupported">
+            <summary>
+            Gets a value indicating whether this class can be used on the current platform.
+            </summary>
+        </member>
+        <member name="M:ArpLookup.LinuxLookupService.PingThenTryReadFromArpTable(System.Net.IPAddress,System.TimeSpan)">
+            <summary>
+            Pings the given <see cref="T:System.Net.IPAddress"/> and waits for an answer for up to the specified timeout duration.
+            Afterwards tries to find an entry for the given <see cref="T:System.Net.IPAddress"/> in the ARP table/local ARP cache.
+            </summary>
+            <param name="ip">The <see cref="T:System.Net.IPAddress"/> to ping and look for.</param>
+            <param name="timeout">The duration to wait for an answer to the ping.</param>
+            <returns>A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> for the given <see cref="T:System.Net.IPAddress"/> or null if the <see cref="T:System.Net.IPAddress"/>
+            could not be found in the ARP cache after the ping completed.</returns>
+        </member>
+        <member name="M:ArpLookup.LinuxLookupService.PingThenTryReadFromArpTableAsync(System.Net.IPAddress,System.TimeSpan)">
+            <summary>
+            Pings the given <see cref="T:System.Net.IPAddress"/> and waits for an answer for up to the specified timeout duration.
+            Afterwards tries to find an entry for the given <see cref="T:System.Net.IPAddress"/> in the ARP table/local ARP cache.
+            </summary>
+            <param name="ip">The <see cref="T:System.Net.IPAddress"/> to ping and look for.</param>
+            <param name="timeout">The duration to wait for an answer to the ping.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task`1"/> representing the result of the asynchronous operation:
+            A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> for the given <see cref="T:System.Net.IPAddress"/> or null if the <see cref="T:System.Net.IPAddress"/>
+            could not be found in the ARP cache after the ping completed.</returns>
+        </member>
+        <member name="M:ArpLookup.LinuxLookupService.TryReadFromArpTable(System.Net.IPAddress)">
+            <summary>
+            Tries to find an entry for the given <see cref="T:System.Net.IPAddress"/> in the ARP table/local ARP cache.
+            </summary>
+            <param name="ip">The <see cref="T:System.Net.IPAddress"/> to look for.</param>
+            <returns>A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> for the given <see cref="T:System.Net.IPAddress"/> or null if
+            the <see cref="T:System.Net.IPAddress"/> could not be found in the ARP cache.</returns>
+        </member>
+        <member name="M:ArpLookup.LinuxLookupService.TryReadFromArpTableAsync(System.Net.IPAddress)">
+            <summary>
+            Tries to find an entry for the given <see cref="T:System.Net.IPAddress"/> in the ARP table/local ARP cache.
+            </summary>
+            <param name="ip">The <see cref="T:System.Net.IPAddress"/> to look for.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task`1"/> representing the result of the asynchronous operation:
+            A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> for the given <see cref="T:System.Net.IPAddress"/> or null if the <see cref="T:System.Net.IPAddress"/>
+            could not be found in the ARP cache.</returns>
+        </member>
+        <member name="T:ArpLookup.PlatformHelpers">
+            <summary>
+            Provides helper methods for corss platform support.
+            </summary>
+        </member>
+        <member name="M:ArpLookup.PlatformHelpers.IsLinux">
+            <summary>
+            Gets a value indicating whether the current platform is Linux-based.
+            </summary>
+            <returns>True if Linux-based, false otherwise.</returns>
+        </member>
+        <member name="M:ArpLookup.PlatformHelpers.IsOsx">
+            <summary>
+            Gets a value indicating whether the current platform is macOS-based.
+            </summary>
+            <returns>True if macOS-based, false otherwise.</returns>
+        </member>
+        <member name="M:ArpLookup.PlatformHelpers.IsWindows">
+            <summary>
+            Gets a value indicating whether the current platform is Windows-based.
+            </summary>
+            <returns>True if Windows-based, false otherwise.</returns>
+        </member>
+        <member name="T:ArpLookup.WindowsLookupService">
+            <summary>
+            Provides the necessary implementations for ARP lookups on Windows platforms.
+            </summary>
+        </member>
+        <member name="P:ArpLookup.WindowsLookupService.IsSupported">
+            <summary>
+            Gets a value indicating whether this class can be used on the current platform.
+            </summary>
+        </member>
+        <member name="M:ArpLookup.WindowsLookupService.Lookup(System.Net.IPAddress)">
+            <summary>
+            Call IpHlpApi.SendARP to lookup the mac address on windows-based systems.
+            </summary>
+            <param name="ip">The <see cref="T:System.Net.IPAddress"/> to pass to the Win32 API.</param>
+            <exception cref="T:System.ComponentModel.Win32Exception">If IpHlpApi.SendARP returns non-zero.</exception>
+            <returns>A <see cref="T:System.Net.NetworkInformation.PhysicalAddress"/> instance that represents the address found by IpHlpApi.SendARP.</returns>
+        </member>
+        <member name="M:ArpLookup.WindowsLookupService.NativeMethods.SendARP(System.UInt32,System.UInt32,System.Byte[],System.Int32@)">
+            <summary>The SendARP function sends an Address Resolution Protocol (ARP) request to obtain the physical address that corresponds to the specified destination IPv4 address.</summary>
+            <param name="destinationIp">The destination IPv4 address, in the form of an <a href="https://docs.microsoft.com/windows/desktop/api/inaddr/ns-inaddr-in_addr">IPAddr</a> structure. The ARP request attempts to obtain the physical address that corresponds to this IPv4 address.</param>
+            <param name="sourceIp">The source IPv4 address of the sender, in the form of an <a href="https://docs.microsoft.com/windows/desktop/api/inaddr/ns-inaddr-in_addr">IPAddr</a> structure. This parameter is optional and is used to select the interface to send the request on for the ARP entry. The caller may specify zero corresponding to the <b>INADDR_ANY</b> IPv4 address for this parameter.</param>
+            <param name="macAddress">A pointer to an array of <b>ULONG</b> variables. This array must have at least two <b>ULONG</b> elements to hold an  Ethernet or token ring physical address. The first six bytes of this array receive the physical address that corresponds to the IPv4 address specified by the <i>DestIP</i> parameter.</param>
+            <param name="physicalAddrLength">
+            <para>On input, a pointer to a <b>ULONG</b> value that specifies the maximum buffer size, in bytes, the application has set aside to receive the physical address or MAC address. The buffer size should be at least 6 bytes for an Ethernet or token ring physical address The buffer to receive the physical address is pointed to by the <i>pMacAddr</i> parameter. On successful output, this parameter points to a value that specifies the number of bytes written to the buffer pointed to by the <i>pMacAddr</i>.</para>
+            <para><see href="https://docs.microsoft.com/windows/win32/api/iphlpapi/nf-iphlpapi-sendarp#parameters">Read more on docs.microsoft.com</see>.</para>
+            </param>
+            <returns>
+            <para>If the function succeeds, the return value is NO_ERROR. If the function fails, the return value is one of the following error codes. </para>
+            <para>This doc was truncated.</para>
+            </returns>
+            <remarks>
+            <para><see href="https://docs.microsoft.com/windows/win32/api/iphlpapi/nf-iphlpapi-sendarp">Learn more about this API from docs.microsoft.com.</see></para>
+            </remarks>
+        </member>
+    </members>
+</doc>
