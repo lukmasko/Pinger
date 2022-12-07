@@ -34,7 +34,7 @@ namespace Pinger
 
          try
          {
-            foreach (string line in System.IO.File.ReadLines(@"oui.csv"))
+            foreach (string line in System.IO.File.ReadLines(@"org.csv"))
             {
                var data = line.Split(',');
 

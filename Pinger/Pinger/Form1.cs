@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Pinger
@@ -6,6 +7,7 @@ namespace Pinger
    public partial class Form1 : Form
    {
       private HostFindManager hostFindManager = new HostFindManager();
+      private SettingsManager settingsManager = new SettingsManager();
 
       public Form1()
       {
@@ -14,14 +16,27 @@ namespace Pinger
 
       private void scan_ctrl_Click(object sender, EventArgs e)
       {
+         settingsManager.Save();
+         rescan_ctrl.Enabled = false;
+         scan_ctrl.Enabled = false;
+
          hostFindManager.Scan(prapareFilter());
          drawResult();
+
+         rescan_ctrl.Enabled = true;
+         scan_ctrl.Enabled = true;
       }
 
       private void rescan_ctrl_Click(object sender, EventArgs e)
       {
+         scan_ctrl.Enabled = false;
+         rescan_ctrl.Enabled = false;
+
          hostFindManager.ReScan(prapareFilter());
          drawResult();
+
+         scan_ctrl.Enabled = true;
+         rescan_ctrl.Enabled = true;
       }
 
       private SearchFilter prapareFilter()
@@ -38,10 +53,26 @@ namespace Pinger
 
       private void drawResult()
       {
+         result_grid_ctrl.Rows.Clear();
          int counter = 0;
          foreach (var device in hostFindManager.getDevices())
          {
-            result_grid_ctrl.Rows.Add((++counter).ToString(), device.IP, device.MacAddress, device.HostName, device.OrganisationName);
+            int col = 0;
+            DataGridViewRow dataGridViewRow = new DataGridViewRow();
+            dataGridViewRow.CreateCells(result_grid_ctrl);
+            dataGridViewRow.Cells[col++].Value = (++counter).ToString();
+            dataGridViewRow.Cells[col++].Value = device.IP;
+            dataGridViewRow.Cells[col++].Value = device.MacAddress;
+            dataGridViewRow.Cells[col++].Value = device.HostName;
+            dataGridViewRow.Cells[col++].Value = device.OrganisationName;
+
+            if (device.ScanState == -1)
+               dataGridViewRow.DefaultCellStyle.BackColor = Color.FromArgb(255, 204, 204);
+            else if (device.ScanState == 0)
+               dataGridViewRow.DefaultCellStyle.BackColor = Color.FromArgb(255, 255, 204);
+            else dataGridViewRow.DefaultCellStyle.BackColor = Color.FromArgb(204, 255, 204);
+
+            result_grid_ctrl.Rows.Add(dataGridViewRow);
          }
       }
 

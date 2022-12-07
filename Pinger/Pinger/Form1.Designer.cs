@@ -45,7 +45,6 @@
          this.label1 = new System.Windows.Forms.Label();
          this.scan_to_ctrl = new System.Windows.Forms.TextBox();
          this.scan_from_ctrl = new System.Windows.Forms.TextBox();
-         this.ping_stop_ctrl = new System.Windows.Forms.Button();
          this.result_grid_ctrl = new System.Windows.Forms.DataGridView();
          this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
          this.ip_address = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -66,7 +65,6 @@
          this.groupBox1.Controls.Add(this.scan_ctrl);
          this.groupBox1.Controls.Add(this.groupBox4);
          this.groupBox1.Controls.Add(this.groupBox3);
-         this.groupBox1.Controls.Add(this.ping_stop_ctrl);
          this.groupBox1.Location = new System.Drawing.Point(12, 12);
          this.groupBox1.Name = "groupBox1";
          this.groupBox1.Size = new System.Drawing.Size(202, 390);
@@ -212,16 +210,6 @@
          this.scan_from_ctrl.TabIndex = 3;
          this.scan_from_ctrl.Text = "1";
          // 
-         // ping_stop_ctrl
-         // 
-         this.ping_stop_ctrl.Enabled = false;
-         this.ping_stop_ctrl.Location = new System.Drawing.Point(40, 320);
-         this.ping_stop_ctrl.Name = "ping_stop_ctrl";
-         this.ping_stop_ctrl.Size = new System.Drawing.Size(126, 23);
-         this.ping_stop_ctrl.TabIndex = 1;
-         this.ping_stop_ctrl.Text = "Stop scan";
-         this.ping_stop_ctrl.UseVisualStyleBackColor = true;
-         // 
          // result_grid_ctrl
          // 
          this.result_grid_ctrl.AllowUserToAddRows = false;
@@ -247,7 +235,7 @@
          this.result_grid_ctrl.Name = "result_grid_ctrl";
          this.result_grid_ctrl.ReadOnly = true;
          this.result_grid_ctrl.RowHeadersVisible = false;
-         this.result_grid_ctrl.Size = new System.Drawing.Size(707, 384);
+         this.result_grid_ctrl.Size = new System.Drawing.Size(674, 384);
          this.result_grid_ctrl.TabIndex = 6;
          // 
          // Column1
@@ -291,9 +279,10 @@
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(939, 430);
+         this.ClientSize = new System.Drawing.Size(906, 430);
          this.Controls.Add(this.result_grid_ctrl);
          this.Controls.Add(this.groupBox1);
+         this.MinimumSize = new System.Drawing.Size(922, 469);
          this.Name = "Form1";
          this.Text = "Pinger 1.02";
          this.groupBox1.ResumeLayout(false);
@@ -323,7 +312,6 @@
       private System.Windows.Forms.Label label1;
       private System.Windows.Forms.TextBox scan_to_ctrl;
       private System.Windows.Forms.TextBox scan_from_ctrl;
-      private System.Windows.Forms.Button ping_stop_ctrl;
       private System.Windows.Forms.DataGridView result_grid_ctrl;
       private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
       private System.Windows.Forms.DataGridViewTextBoxColumn ip_address;

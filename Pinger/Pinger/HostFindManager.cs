@@ -6,18 +6,34 @@ namespace Pinger
 {
    class HostFindManager
    {
-      private List<DeviceInfo> firstScanDevices;
-      private List<DeviceInfo> secondScanDevices;
+      private List<DeviceInfo> devices;
 
       public void Scan(SearchFilter searchFilter)
       {
-         secondScanDevices = null;
-         firstScanDevices = _scan(searchFilter);
+         devices = _scan(searchFilter);
       }
 
       public void ReScan(SearchFilter searchFilter)
       {
-         secondScanDevices = _scan(searchFilter);
+         devices.RemoveAll(x => x.ScanState == -1);
+
+         List<DeviceInfo> tmpScanDevices = _scan(searchFilter);
+
+         foreach (var dev in devices)
+         {
+            if (tmpScanDevices.Exists(x => x.IP == dev.IP))
+               dev.ScanState = 0;
+            else dev.ScanState = -1;
+         }
+
+         foreach(var tmp in tmpScanDevices)
+         {
+            if(!devices.Exists(x => x.IP == tmp.IP))
+            {
+               tmp.ScanState = 1;
+               devices.Add(tmp);
+            }
+         }
       }
 
       private List<DeviceInfo> _scan(SearchFilter searchFilter)
@@ -47,7 +63,7 @@ namespace Pinger
 
       internal IEnumerable<DeviceInfo> getDevices()
       {
-         foreach (DeviceInfo device in firstScanDevices)
+         foreach (DeviceInfo device in devices)
          {
             yield return device;
          }
