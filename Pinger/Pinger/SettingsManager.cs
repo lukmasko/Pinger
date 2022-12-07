@@ -22,7 +22,7 @@ namespace Pinger
          if (!File.Exists(default_filename))
          {
             //setDefault();
-            Save();
+            Save();xxx
             return;
          }
 
